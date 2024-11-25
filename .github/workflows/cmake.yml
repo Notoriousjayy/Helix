@@ -1,4 +1,4 @@
-name: CMake on Unix/Linux
+name: Build and Test with Artifact Management
 
 on:
   push:
@@ -19,17 +19,21 @@ jobs:
             cpp_compiler: g++
 
     steps:
+    # Step 1: Checkout repository
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # Step 2: Install dependencies
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y clang-tidy cmake gcc g++ libcunit1 libcunit1-dev
 
+    # Step 3: Prepare custom CMake modules directory
     - name: Prepare CMake Modules
       run: mkdir -p ${{ github.workspace }}/cmake/Modules
 
+    # Step 4: Add custom FindCUnit.cmake file
     - name: Add Custom FindCUnit.cmake
       run: |
         echo "find_path(CUNIT_INCLUDE_DIR CUnit/CUnit.h)" > ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
@@ -41,9 +45,11 @@ jobs:
         echo "    set(CUNIT_LIBRARIES \${CUNIT_LIBRARY})" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
         echo "endif()" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
 
+    # Step 5: Clean build directory
     - name: Clean Build Directory
       run: rm -rf ${{ github.workspace }}/cmake-build-debug
 
+    # Step 6: Configure CMake
     - name: Configure CMake
       run: |
         cmake -B ${{ github.workspace }}/cmake-build-debug \
@@ -53,9 +59,32 @@ jobs:
         -DCMAKE_MODULE_PATH="${{ github.workspace }}/cmake/Modules" \
         -S ${{ github.workspace }}
 
+    # Step 7: Build project
     - name: Build
       run: cmake --build ${{ github.workspace }}/cmake-build-debug --config ${{ matrix.build_type }}
 
+    # Step 8: Run tests
     - name: Run Unit Tests
       working-directory: ${{ github.workspace }}/cmake-build-debug
       run: ctest --output-on-failure --build-config ${{ matrix.build_type }}
+
+    # Step 9: Compress and upload build artifacts
+    - name: Compress Artifacts
+      run: |
+        mkdir -p ${{ github.workspace }}/artifacts
+        tar -czf ${{ github.workspace }}/artifacts/executables.tar.gz \
+          ${{ github.workspace }}/cmake-build-debug/Helix
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: ${{ github.workspace }}/artifacts/executables.tar.gz
+
+    # Step 10: Upload test logs on failure
+    - name: Upload Test Logs
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-logs
+        path: ${{ github.workspace }}/cmake-build-debug/Testing/Temporary/LastTest.log
