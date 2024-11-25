@@ -24,56 +24,52 @@ jobs:
             cpp_compiler: g++
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Remove previous build directory
-        run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            if [ -d "${{ github.workspace }}/build" ]; then
-              rm -rf "${{ github.workspace }}/build"
-            fi
-          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
-            if (Test-Path "${{ github.workspace }}\build") {
-              Remove-Item -Recurse -Force "${{ github.workspace }}\build"
-            }
-          fi
-        shell: bash
+    - name: Remove previous build directory
+      shell: bash
+      run: |
+        if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+          rm -rf ./cmake-build-debug || true
+        elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+          Remove-Item -Recurse -Force .\cmake-build-debug || Write-Host "No build directory exists"
+        fi
 
-      - name: Cache CMake files
-        uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}/build
-          key: ${{ runner.os }}-cmake-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-cmake-
+    - name: Cache CMake files
+      uses: actions/cache@v3
+      with:
+        path: ./cmake-build-debug
+        key: ${{ runner.os }}-cmake-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-cmake-
 
-      - name: Set reusable strings
-        id: strings
-        run: |
-          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-        shell: bash
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/cmake-build-debug" >> "$GITHUB_OUTPUT"
 
-      - name: Lint check with clang-tidy
-        run: clang-tidy ./src/**/*.c -- -I ./include
+    - name: Lint check with clang-tidy
+      run: |
+        clang-tidy ./src/**/*.c ./src/**/*.h -- -std=c11
 
-      - name: Configure CMake
-        run: |
-          cmake -B ${{ steps.strings.outputs.build-output-dir }} \
-            -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
-            -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-            -S ${{ github.workspace }}
+    - name: Configure CMake
+      run: |
+        cmake -B ${{ steps.strings.outputs.build-output-dir }} \
+              -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+              -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+              -S ${{ github.workspace }}
 
-      - name: Build
-        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-      - name: Run unit tests
-        working-directory: ${{ steps.strings.outputs.build-output-dir }}
-        run: ctest --output-on-failure --build-config ${{ matrix.build_type }}
+    - name: Run unit tests
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ctest --output-on-failure --build-config ${{ matrix.build_type }}
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-logs
-          path: ${{ steps.strings.outputs.build-output-dir }}
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-logs
+        path: ${{ steps.strings.outputs.build-output-dir }}/
