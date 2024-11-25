@@ -22,9 +22,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Remove previous build directory
-      run: rm -rf ${{ github.workspace }}/cmake-build-debug
-
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -33,10 +30,22 @@ jobs:
     - name: Prepare CMake Modules
       run: mkdir -p ${{ github.workspace }}/cmake/Modules
 
-    - name: Debug Installed Files
+    - name: Add Custom FindCUnit.cmake
       run: |
-        echo "Checking for installed CUnit files:"
+        echo "find_path(CUNIT_INCLUDE_DIR CUnit/CUnit.h)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+        echo "find_library(CUNIT_LIBRARY cunit)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+        echo "include(FindPackageHandleStandardArgs)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+        echo "find_package_handle_standard_args(CUnit DEFAULT_MSG CUNIT_INCLUDE_DIR CUNIT_LIBRARY)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+        echo "if(CUNIT_FOUND)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+        echo "    set(CUNIT_INCLUDE_DIRS \${CUNIT_INCLUDE_DIR})" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+        echo "    set(CUNIT_LIBRARIES \${CUNIT_LIBRARY})" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+        echo "endif()" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+
+    - name: Debug Installed CUnit
+      run: |
+        echo "Installed CUnit files:"
         find /usr -name "CUnit*"
+        echo "Installed packages:"
         apt list --installed | grep cunit
 
     - name: Configure CMake
@@ -51,47 +60,6 @@ jobs:
     - name: Build
       run: cmake --build ${{ github.workspace }}/cmake-build-debug --config ${{ matrix.build_type }}
 
-    - name: Check build output directory
-      run: ls -R ${{ github.workspace }}/cmake-build-debug
-
     - name: Run Unit Tests
       working-directory: ${{ github.workspace }}/cmake-build-debug
-      run: |
-        echo "Running unit tests..."
-        ctest --output-on-failure --build-config ${{ matrix.build_type }}
-
-    - name: Upload Build Artifacts (on failure)
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: build-logs
-        path: ${{ github.workspace }}/cmake-build-debug
-
-    - name: Ensure install directory exists
-      run: mkdir -p ${{ github.workspace }}/install
-
-    - name: Install Build Artifacts
-      run: |
-        cmake --install ${{ github.workspace }}/cmake-build-debug \
-        --config ${{ matrix.build_type }} \
-        --prefix ${{ github.workspace }}/install --verbose
-
-    - name: Verify Installation Directory
-      run: |
-        echo "Verifying installed files:"
-        ls -l ${{ github.workspace }}/install
-        if [ ! -d "${{ github.workspace }}/install" ] || [ -z "$(ls -A ${{ github.workspace }}/install)" ]; then
-          echo "Error: Install directory is empty or does not exist."
-          exit 1
-        fi
-
-    - name: Create Binary Package
-      run: |
-        mkdir -p ${{ github.workspace }}/packages
-        tar -czf ${{ github.workspace }}/packages/myproject-${{ matrix.build_type }}.tar.gz -C ${{ github.workspace }}/install .
-
-    - name: Upload Binary Package
-      uses: actions/upload-artifact@v3
-      with:
-        name: binary-package-${{ matrix.build_type }}
-        path: ${{ github.workspace }}/packages/myproject-${{ matrix.build_type }}.tar.gz
+      run: ctest --output-on-failure --build-config ${{ matrix.build_type }}
