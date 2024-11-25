@@ -23,83 +23,75 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Remove previous build directory
-      run: |
-        rm -rf ${{ github.workspace }}/cmake-build-debug
-
-    - name: Cache CMake files
-      uses: actions/cache@v3
-      with:
-        path: ${{ github.workspace }}/cmake-build-debug
-        key: linux-cmake-${{ github.ref_name }}-${{ matrix.build_type }}
-        restore-keys: |
-          linux-cmake-
+      run: rm -rf ${{ github.workspace }}/cmake-build-debug
 
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y clang-tidy cmake gcc g++ libcunit1 libcunit1-dev
 
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/cmake-build-debug" >> "$GITHUB_OUTPUT"
+    - name: Prepare CMake Modules
+      run: mkdir -p ${{ github.workspace }}/cmake/Modules
 
-    - name: Lint check with clang-tidy
+    - name: Debug Installed Files
       run: |
-        clang-tidy \
-        $(find ${{ github.workspace }}/src -name '*.c') \
-        -p ${{ steps.strings.outputs.build-output-dir }}
+        echo "Checking for installed CUnit files:"
+        find /usr -name "CUnit*"
+        apt list --installed | grep cunit
 
     - name: Configure CMake
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      run: |
+        cmake -B ${{ github.workspace }}/cmake-build-debug \
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+        -DCMAKE_MODULE_PATH="${{ github.workspace }}/cmake/Modules" \
         -S ${{ github.workspace }}
 
     - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      run: cmake --build ${{ github.workspace }}/cmake-build-debug --config ${{ matrix.build_type }}
 
     - name: Check build output directory
-      run: ls -R ${{ steps.strings.outputs.build-output-dir }}
+      run: ls -R ${{ github.workspace }}/cmake-build-debug
+
+    - name: Run Unit Tests
+      working-directory: ${{ github.workspace }}/cmake-build-debug
+      run: |
+        echo "Running unit tests..."
+        ctest --output-on-failure --build-config ${{ matrix.build_type }}
+
+    - name: Upload Build Artifacts (on failure)
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-logs
+        path: ${{ github.workspace }}/cmake-build-debug
 
     - name: Ensure install directory exists
       run: mkdir -p ${{ github.workspace }}/install
 
-    - name: Debug install step
-      run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} --prefix ${{ github.workspace }}/install --verbose
-
-    - name: Verify installation directory
+    - name: Install Build Artifacts
       run: |
-        echo "Listing installed files:"
+        cmake --install ${{ github.workspace }}/cmake-build-debug \
+        --config ${{ matrix.build_type }} \
+        --prefix ${{ github.workspace }}/install --verbose
+
+    - name: Verify Installation Directory
+      run: |
+        echo "Verifying installed files:"
         ls -l ${{ github.workspace }}/install
         if [ ! -d "${{ github.workspace }}/install" ] || [ -z "$(ls -A ${{ github.workspace }}/install)" ]; then
           echo "Error: Install directory is empty or does not exist."
           exit 1
         fi
 
-    - name: Create binary package
+    - name: Create Binary Package
       run: |
         mkdir -p ${{ github.workspace }}/packages
         tar -czf ${{ github.workspace }}/packages/myproject-${{ matrix.build_type }}.tar.gz -C ${{ github.workspace }}/install .
 
-    - name: Upload binary package
+    - name: Upload Binary Package
       uses: actions/upload-artifact@v3
       with:
         name: binary-package-${{ matrix.build_type }}
         path: ${{ github.workspace }}/packages/myproject-${{ matrix.build_type }}.tar.gz
-
-    - name: Run unit tests
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: |
-        echo "Running unit tests..."
-        ctest --output-on-failure --build-config ${{ matrix.build_type }}
-
-    - name: Upload build artifacts
-      if: failure()
-      uses: actions/upload-artifact@v3
-      with:
-        name: build-logs
-        path: ${{ steps.strings.outputs.build-output-dir }}
