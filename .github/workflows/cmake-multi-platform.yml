@@ -60,6 +60,20 @@ jobs:
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
+    - name: Install the built code
+      run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} --prefix ${{ github.workspace }}/install
+
+    - name: Create binary package
+      run: |
+        mkdir -p ${{ github.workspace }}/packages
+        tar -czf ${{ github.workspace }}/packages/myproject-${{ matrix.build_type }}.tar.gz -C ${{ github.workspace }}/install .
+
+    - name: Upload binary package
+      uses: actions/upload-artifact@v3
+      with:
+        name: binary-package-${{ matrix.build_type }}
+        path: ${{ github.workspace }}/packages/myproject-${{ matrix.build_type }}.tar.gz
+
     - name: Run unit tests
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --output-on-failure --build-config ${{ matrix.build_type }}
