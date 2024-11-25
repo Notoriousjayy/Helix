@@ -29,7 +29,10 @@ jobs:
 
     - name: Remove previous build directory
       run: |
-        rm -rf ${{ github.workspace }}/cmake-build-debug
+        if [ -d "${{ github.workspace }}/cmake-build-debug" ]; then
+          rm -rf ${{ github.workspace }}/cmake-build-debug
+        else
+          powershell -Command "Remove-Item -Recurse -Force '${{ github.workspace }}\\cmake-build-debug'"
 
     - name: Cache CMake files
       uses: actions/cache@v3
