@@ -32,7 +32,7 @@ jobs:
 
     - name: Add Custom FindCUnit.cmake
       run: |
-        echo "find_path(CUNIT_INCLUDE_DIR CUnit/CUnit.h)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
+        echo "find_path(CUNIT_INCLUDE_DIR CUnit/CUnit.h)" > ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
         echo "find_library(CUNIT_LIBRARY cunit)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
         echo "include(FindPackageHandleStandardArgs)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
         echo "find_package_handle_standard_args(CUnit DEFAULT_MSG CUNIT_INCLUDE_DIR CUNIT_LIBRARY)" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
@@ -41,12 +41,8 @@ jobs:
         echo "    set(CUNIT_LIBRARIES \${CUNIT_LIBRARY})" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
         echo "endif()" >> ${{ github.workspace }}/cmake/Modules/FindCUnit.cmake
 
-    - name: Debug Installed CUnit
-      run: |
-        echo "Installed CUnit files:"
-        find /usr -name "CUnit*"
-        echo "Installed packages:"
-        apt list --installed | grep cunit
+    - name: Clean Build Directory
+      run: rm -rf ${{ github.workspace }}/cmake-build-debug
 
     - name: Configure CMake
       run: |
