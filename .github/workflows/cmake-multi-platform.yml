@@ -24,25 +24,37 @@ jobs:
             cpp_compiler: g++
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Cache CMake files
       uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/build
+        path: ${{ github.workspace }}/cmake-build-debug
         key: ${{ runner.os }}-cmake-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-cmake-
+
+    - name: Install dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install -y clang-tidy cmake gcc g++
+
+    - name: Install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 
     - name: Set reusable strings
       id: strings
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "build-output-dir=${{ github.workspace }}/cmake-build-debug" >> "$GITHUB_OUTPUT"
 
-    - name: Install dependencies (Linux)
+    - name: Lint check with clang-tidy
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install -y clang-tidy
+      run: |
+        clang-tidy --quiet \
+        $(find ${{ github.workspace }}/src -name '*.c') \
+        -p ${{ steps.strings.outputs.build-output-dir }}
 
     - name: Configure CMake
       run: >
@@ -51,14 +63,6 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
-
-    - name: Lint check with clang-tidy
-      if: matrix.os == 'ubuntu-latest'
-      run: >
-        clang-tidy
-        -p ${{ steps.strings.outputs.build-output-dir }}
-        --quiet
-        $(find ${{ github.workspace }}/src -name '*.cpp' -o -name '*.c')
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
