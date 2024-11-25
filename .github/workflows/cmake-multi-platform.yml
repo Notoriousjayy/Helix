@@ -35,7 +35,9 @@ jobs:
           linux-cmake-
 
     - name: Install dependencies
-      run: sudo apt-get install -y clang-tidy cmake gcc g++
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-tidy cmake gcc g++ libcunit1 libcunit1-dev
 
     - name: Set reusable strings
       id: strings
@@ -91,7 +93,9 @@ jobs:
 
     - name: Run unit tests
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ctest --output-on-failure --build-config ${{ matrix.build_type }}
+      run: |
+        echo "Running unit tests..."
+        ctest --output-on-failure --build-config ${{ matrix.build_type }}
 
     - name: Upload build artifacts
       if: failure()
