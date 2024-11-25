@@ -63,6 +63,15 @@ jobs:
     - name: Install the built code
       run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} --prefix ${{ github.workspace }}/install
 
+    - name: Verify installation directory
+      run: |
+        echo "Listing installed files:"
+        ls -l ${{ github.workspace }}/install
+        if [ ! -d "${{ github.workspace }}/install" ] || [ -z "$(ls -A ${{ github.workspace }}/install)" ]; then
+          echo "Error: Install directory is empty or does not exist."
+          exit 1
+        fi
+
     - name: Create binary package
       run: |
         mkdir -p ${{ github.workspace }}/packages
