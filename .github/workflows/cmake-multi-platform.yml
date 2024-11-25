@@ -60,8 +60,14 @@ jobs:
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Install the built code
-      run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} --prefix ${{ github.workspace }}/install
+    - name: Check build output directory
+      run: ls -R ${{ steps.strings.outputs.build-output-dir }}
+
+    - name: Ensure install directory exists
+      run: mkdir -p ${{ github.workspace }}/install
+
+    - name: Debug install step
+      run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} --prefix ${{ github.workspace }}/install --verbose
 
     - name: Verify installation directory
       run: |
