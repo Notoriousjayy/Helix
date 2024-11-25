@@ -26,13 +26,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Debug Paths
+      shell: bash
+      run: |
+        echo "Workspace: ${{ github.workspace }}"
+        ls -al ${{ github.workspace }}
+
     - name: Remove previous build directory
       shell: bash
       run: |
-        if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-          rm -rf ./cmake-build-debug || true
-        elif [ "${{ matrix.os }}" == "windows-latest" ]; then
-          Remove-Item -Recurse -Force .\cmake-build-debug || Write-Host "No build directory exists"
+        if [ -d "${{ github.workspace }}/cmake-build-debug" ]; then
+          rm -rf "${{ github.workspace }}/cmake-build-debug"
         fi
 
     - name: Cache CMake files
@@ -50,8 +54,9 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/cmake-build-debug" >> "$GITHUB_OUTPUT"
 
     - name: Lint check with clang-tidy
+      shell: bash
       run: |
-        clang-tidy ./src/**/*.c ./src/**/*.h -- -std=c11
+        find ./src -name "*.c" -o -name "*.h" | xargs clang-tidy -- -std=c11
 
     - name: Configure CMake
       run: |
@@ -72,4 +77,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: build-logs
-        path: ${{ steps.strings.outputs.build-output-dir }}/
+        path: ${{ steps.strings.outputs.build-output-dir }}
