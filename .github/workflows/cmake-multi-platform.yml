@@ -40,6 +40,10 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: Install dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install -y clang-tidy
+
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -48,10 +52,18 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
 
+    - name: Lint check with clang-tidy
+      if: matrix.os == 'ubuntu-latest'
+      run: >
+        clang-tidy
+        -p ${{ steps.strings.outputs.build-output-dir }}
+        --quiet
+        $(find ${{ github.workspace }}/src -name '*.cpp' -o -name '*.c')
+
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Test
+    - name: Run unit tests
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --output-on-failure --build-config ${{ matrix.build_type }}
 
