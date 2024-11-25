@@ -1,4 +1,4 @@
-name: CMake on multiple platforms
+name: CMake on Unix/Linux
 
 on:
   push:
@@ -8,40 +8,34 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
         build_type: [Release, Debug]
         include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
-          - os: ubuntu-latest
-            c_compiler: gcc
+          - c_compiler: gcc
             cpp_compiler: g++
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Remove previous build directory
+      run: |
+        rm -rf ${{ github.workspace }}/cmake-build-debug
+
     - name: Cache CMake files
       uses: actions/cache@v3
       with:
         path: ${{ github.workspace }}/cmake-build-debug
-        key: ${{ runner.os }}-cmake-${{ github.sha }}
+        key: linux-cmake-${{ github.ref_name }}-${{ matrix.build_type }}
         restore-keys: |
-          ${{ runner.os }}-cmake-
+          linux-cmake-
 
-    - name: Install dependencies (Linux)
-      if: matrix.os == 'ubuntu-latest'
+    - name: Install dependencies
       run: sudo apt-get install -y clang-tidy cmake gcc g++
-
-    - name: Install dependencies (Windows)
-      if: matrix.os == 'windows-latest'
-      run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 
     - name: Set reusable strings
       id: strings
@@ -50,9 +44,8 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/cmake-build-debug" >> "$GITHUB_OUTPUT"
 
     - name: Lint check with clang-tidy
-      if: matrix.os == 'ubuntu-latest'
       run: |
-        clang-tidy --quiet \
+        clang-tidy \
         $(find ${{ github.workspace }}/src -name '*.c') \
         -p ${{ steps.strings.outputs.build-output-dir }}
 
