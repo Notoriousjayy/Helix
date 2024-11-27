@@ -9,13 +9,14 @@
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
-						"string" : "3.25"
+						"string" : "3.10"
 					},
 					"projectIndex" : 0,
 					"source" : ".",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -30,7 +31,8 @@
 					"name" : "Helix",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -39,8 +41,15 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Helix::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Helix-Debug-9124753f704bd8a6482d.json",
+					"jsonFile" : "target-Helix-Debug-89c70ca76dad59fb6fb1.json",
 					"name" : "Helix",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "test_array::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test_array-Debug-eefbbe7f3c2fe6bf90c6.json",
+					"name" : "test_array",
 					"projectIndex" : 0
 				}
 			]

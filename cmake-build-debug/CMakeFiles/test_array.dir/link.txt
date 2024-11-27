@@ -1,0 +1,1 @@
+/usr/bin/cc -g CMakeFiles/test_array.dir/test/test_array.c.o CMakeFiles/test_array.dir/src/data_structures/array.c.o -o test_array  /usr/lib/x86_64-linux-gnu/libcunit.so 

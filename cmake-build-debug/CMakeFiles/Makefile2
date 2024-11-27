@@ -64,6 +64,7 @@ CMAKE_BINARY_DIR = /home/jordan/Helix/cmake-build-debug
 
 # The main recursive "all" target.
 all: CMakeFiles/Helix.dir/all
+all: CMakeFiles/test_array.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -72,6 +73,7 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles/Helix.dir/clean
+clean: CMakeFiles/test_array.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -99,6 +101,32 @@ Helix: CMakeFiles/Helix.dir/rule
 CMakeFiles/Helix.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Helix.dir/build.make CMakeFiles/Helix.dir/clean
 .PHONY : CMakeFiles/Helix.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_array.dir
+
+# All Build rule for target.
+CMakeFiles/test_array.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jordan/Helix/cmake-build-debug/CMakeFiles --progress-num=4,5,6 "Built target test_array"
+.PHONY : CMakeFiles/test_array.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_array.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jordan/Helix/cmake-build-debug/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_array.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jordan/Helix/cmake-build-debug/CMakeFiles 0
+.PHONY : CMakeFiles/test_array.dir/rule
+
+# Convenience name for target.
+test_array: CMakeFiles/test_array.dir/rule
+.PHONY : test_array
+
+# clean rule for target.
+CMakeFiles/test_array.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/clean
+.PHONY : CMakeFiles/test_array.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
