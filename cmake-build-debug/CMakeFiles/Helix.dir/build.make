@@ -69,24 +69,10 @@ include CMakeFiles/Helix.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Helix.dir/flags.make
 
-CMakeFiles/Helix.dir/src/main.c.o: CMakeFiles/Helix.dir/flags.make
-CMakeFiles/Helix.dir/src/main.c.o: /home/jordan/Helix/src/main.c
-CMakeFiles/Helix.dir/src/main.c.o: CMakeFiles/Helix.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jordan/Helix/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/Helix.dir/src/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/Helix.dir/src/main.c.o -MF CMakeFiles/Helix.dir/src/main.c.o.d -o CMakeFiles/Helix.dir/src/main.c.o -c /home/jordan/Helix/src/main.c
-
-CMakeFiles/Helix.dir/src/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Helix.dir/src/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/jordan/Helix/src/main.c > CMakeFiles/Helix.dir/src/main.c.i
-
-CMakeFiles/Helix.dir/src/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Helix.dir/src/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/jordan/Helix/src/main.c -o CMakeFiles/Helix.dir/src/main.c.s
-
 CMakeFiles/Helix.dir/src/data_structures/array.c.o: CMakeFiles/Helix.dir/flags.make
 CMakeFiles/Helix.dir/src/data_structures/array.c.o: /home/jordan/Helix/src/data_structures/array.c
 CMakeFiles/Helix.dir/src/data_structures/array.c.o: CMakeFiles/Helix.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jordan/Helix/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Helix.dir/src/data_structures/array.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jordan/Helix/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/Helix.dir/src/data_structures/array.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/Helix.dir/src/data_structures/array.c.o -MF CMakeFiles/Helix.dir/src/data_structures/array.c.o.d -o CMakeFiles/Helix.dir/src/data_structures/array.c.o -c /home/jordan/Helix/src/data_structures/array.c
 
 CMakeFiles/Helix.dir/src/data_structures/array.c.i: cmake_force
@@ -97,16 +83,30 @@ CMakeFiles/Helix.dir/src/data_structures/array.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Helix.dir/src/data_structures/array.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/jordan/Helix/src/data_structures/array.c -o CMakeFiles/Helix.dir/src/data_structures/array.c.s
 
+CMakeFiles/Helix.dir/src/main.c.o: CMakeFiles/Helix.dir/flags.make
+CMakeFiles/Helix.dir/src/main.c.o: /home/jordan/Helix/src/main.c
+CMakeFiles/Helix.dir/src/main.c.o: CMakeFiles/Helix.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jordan/Helix/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Helix.dir/src/main.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/Helix.dir/src/main.c.o -MF CMakeFiles/Helix.dir/src/main.c.o.d -o CMakeFiles/Helix.dir/src/main.c.o -c /home/jordan/Helix/src/main.c
+
+CMakeFiles/Helix.dir/src/main.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Helix.dir/src/main.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/jordan/Helix/src/main.c > CMakeFiles/Helix.dir/src/main.c.i
+
+CMakeFiles/Helix.dir/src/main.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Helix.dir/src/main.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/jordan/Helix/src/main.c -o CMakeFiles/Helix.dir/src/main.c.s
+
 # Object files for target Helix
 Helix_OBJECTS = \
-"CMakeFiles/Helix.dir/src/main.c.o" \
-"CMakeFiles/Helix.dir/src/data_structures/array.c.o"
+"CMakeFiles/Helix.dir/src/data_structures/array.c.o" \
+"CMakeFiles/Helix.dir/src/main.c.o"
 
 # External object files for target Helix
 Helix_EXTERNAL_OBJECTS =
 
-Helix: CMakeFiles/Helix.dir/src/main.c.o
 Helix: CMakeFiles/Helix.dir/src/data_structures/array.c.o
+Helix: CMakeFiles/Helix.dir/src/main.c.o
 Helix: CMakeFiles/Helix.dir/build.make
 Helix: CMakeFiles/Helix.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/jordan/Helix/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable Helix"

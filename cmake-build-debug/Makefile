@@ -65,6 +65,16 @@ CMAKE_BINARY_DIR = /home/jordan/Helix/cmake-build-debug
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -129,12 +139,26 @@ Helix/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Helix.dir/build.make CMakeFiles/Helix.dir/build
 .PHONY : Helix/fast
 
+#=============================================================================
+# Target rules for targets named test_array
+
+# Build rule for target.
+test_array: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_array
+.PHONY : test_array
+
+# fast build rule for target.
+test_array/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/build
+.PHONY : test_array/fast
+
 src/data_structures/array.o: src/data_structures/array.c.o
 .PHONY : src/data_structures/array.o
 
 # target to build an object file
 src/data_structures/array.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Helix.dir/build.make CMakeFiles/Helix.dir/src/data_structures/array.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/src/data_structures/array.c.o
 .PHONY : src/data_structures/array.c.o
 
 src/data_structures/array.i: src/data_structures/array.c.i
@@ -143,6 +167,7 @@ src/data_structures/array.i: src/data_structures/array.c.i
 # target to preprocess a source file
 src/data_structures/array.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Helix.dir/build.make CMakeFiles/Helix.dir/src/data_structures/array.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/src/data_structures/array.c.i
 .PHONY : src/data_structures/array.c.i
 
 src/data_structures/array.s: src/data_structures/array.c.s
@@ -151,6 +176,7 @@ src/data_structures/array.s: src/data_structures/array.c.s
 # target to generate assembly for a file
 src/data_structures/array.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Helix.dir/build.make CMakeFiles/Helix.dir/src/data_structures/array.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/src/data_structures/array.c.s
 .PHONY : src/data_structures/array.c.s
 
 src/main.o: src/main.c.o
@@ -177,6 +203,30 @@ src/main.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Helix.dir/build.make CMakeFiles/Helix.dir/src/main.c.s
 .PHONY : src/main.c.s
 
+test/test_array.o: test/test_array.c.o
+.PHONY : test/test_array.o
+
+# target to build an object file
+test/test_array.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/test/test_array.c.o
+.PHONY : test/test_array.c.o
+
+test/test_array.i: test/test_array.c.i
+.PHONY : test/test_array.i
+
+# target to preprocess a source file
+test/test_array.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/test/test_array.c.i
+.PHONY : test/test_array.c.i
+
+test/test_array.s: test/test_array.c.s
+.PHONY : test/test_array.s
+
+# target to generate assembly for a file
+test/test_array.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_array.dir/build.make CMakeFiles/test_array.dir/test/test_array.c.s
+.PHONY : test/test_array.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -185,13 +235,18 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... test"
 	@echo "... Helix"
+	@echo "... test_array"
 	@echo "... src/data_structures/array.o"
 	@echo "... src/data_structures/array.i"
 	@echo "... src/data_structures/array.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... test/test_array.o"
+	@echo "... test/test_array.i"
+	@echo "... test/test_array.s"
 .PHONY : help
 
 
